@@ -41,7 +41,7 @@ int main(void)
 		return 0;
 	}
 
-	if (print_sha256("EMG test packet") != PSA_SUCCESS) {
+	if (print_sha256("EMG") != PSA_SUCCESS) {
 		return 0;
 	}
 	/* The baseline changes just one character: p -> P. */
