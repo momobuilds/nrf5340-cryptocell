@@ -4,6 +4,12 @@
 
 **TEST KEY — NOT FOR PRODUCTION.** The key is public in the source. This lesson teaches authentication but does not establish a secure production system. Anyone knowing this test key can decrypt or forge these demonstration messages.
 
+## Visual explanation
+
+![Lesson 4: AES-128-CCM encrypts and authenticates EMG samples before the receiver uses them.](images/lesson4-aead.svg)
+
+Read the upper row from left to right: the board combines sample bytes and visible AAD with a generated nonce and test key. AES-128-CCM produces ciphertext plus an authentication tag. The lower row shows the receiver supplying that same context to `psa_aead_decrypt()`: the tag is checked before the recovered samples are accepted.
+
 ## 1. What are we trying to learn?
 
 Encrypt eight simulated EMG samples, authenticate and decrypt them on the nRF5340, and confirm the recovered bytes match. The receiver's authentication check must work without knowing the original samples.
