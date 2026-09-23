@@ -1,0 +1,6 @@
+# Generated files; lesson source and documentation remain visible.
+.cache/
+build/
+build-*/
+*.log
+.DS_Store
