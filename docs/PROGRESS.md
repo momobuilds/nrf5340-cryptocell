@@ -14,6 +14,7 @@ Updated: 2026-09-23. This separates what we prepared from what was demonstrated 
 8. We created Phase 3: fixed public AES test key, random IV, CTR encryption/decryption, and a byte-for-byte comparison. The application was built; a matching device transcript has not been supplied.
 9. You asked about programming an external nRF5340 module through the PCA10095 debugger. The module's exact part number, power voltage, and debug connector are still unknown. No external-target wiring or flashing has been performed by the assistant.
 10. We reorganized these lessons into independent projects so returning to one does not overwrite another.
+11. You authorized Lesson 4. We added an independent AES-128-CCM lesson with eight simulated samples, authenticated example metadata, a random 13-byte nonce, and a 16-byte tag. It builds and links the CC312 AEAD driver; runtime verification remains pending. Lesson 1 flashing was subsequently reported successful, but no full runtime transcript was provided.
 
 ## Where the separated source came from
 
@@ -31,8 +32,9 @@ These are reconstructed earlier lessons, not claimed recoveries of every histori
 | 1 — random | Passed as an independent application | User saw output; full PSA status/random transcript still needed |
 | 2 — SHA-256 | Passed as an independent application | Exact digest comparison on board still needs a recorded transcript |
 | 3 — AES-CTR | Passed as an independent application | `Exact match: YES` and successful cleanup still need a recorded transcript |
+| 4 — AES-CCM | Passed as an independent application | Authentication and exact recovery still need a device transcript |
 
-The compiled backend paths were inspected: RNG calls the Nordic CC312 platform generator; SHA-256 and AES-CTR call Oberon software. This is build evidence. No power measurement, timing benchmark, or direct observation of peripheral activity has been performed.
+The compiled backend paths were inspected: RNG calls the Nordic CC312 platform generator; SHA-256 and AES-CTR call Oberon software. Lesson 4 selects CC312 for AES-CCM; its compiled wrappers call the CC3XX AEAD functions. This is build evidence. No power measurement, timing benchmark, or direct observation of peripheral activity has been performed.
 
 The SHA-256 reference outputs were independently calculated with Python's standard `hashlib`. The AES test's runtime check exists in firmware; compilation alone does not prove it passed on the board.
 
@@ -69,10 +71,20 @@ After each flash, open the serial monitor and press RESET. Paste the output belo
 - Fresh IV/ciphertext after reset:
 - Output/notes:
 
+### Phase 4
+
+- Date:
+- Flash verified:
+- `psa_aead_decrypt: 0`:
+- `Authentication: PASS`:
+- `Exact match: YES`:
+- `psa_destroy_key: 0`:
+- Output/notes:
+
 ## Not implemented yet
 
-Authenticated encryption, corruption rejection, experimental nonce/session design, EMG serialization, encrypted transport frames, Python receiver, multi-packet automation, algorithm/power benchmarks, real Wings ADC integration, production key management, authenticated key establishment, separated TF-M services, and secure boot are future phases.
+Deliberate corruption testing, experimental nonce/session design, a realistic Wings packet format beyond the minimal Lesson 4 encoding, encrypted transport frames, Python receiver, multi-packet automation, algorithm/power benchmarks, real Wings ADC integration, production key management, authenticated key establishment, separated TF-M services, and secure boot are future phases.
 
 The DK target may enable TrustZone-related hardware configuration by default. That does not mean these lessons implement an isolated secure service or verified secure boot.
 
-Resume with whichever lesson you want to review. Phase 4 should only begin when you explicitly choose to continue.
+Resume with whichever lesson you want to review. Lesson 4 is now prepared. Lesson 5 should only begin when you explicitly choose to continue.

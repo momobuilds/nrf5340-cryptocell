@@ -2,6 +2,7 @@
     "nrf-connect.applications": [
         "${workspaceFolder}/lessons/01_random",
         "${workspaceFolder}/lessons/02_sha256",
-        "${workspaceFolder}/lessons/03_aes_ctr"
+        "${workspaceFolder}/lessons/03_aes_ctr",
+        "${workspaceFolder}/lessons/04_aead_ccm"
     ]
 }

@@ -4,6 +4,16 @@
 
 **TEST KEY — NOT FOR PRODUCTION. AES-CTR here is an educational example without authentication. It must not replace AEAD in the Wings packet-security design.**
 
+## Visual explanation
+
+![Lesson 3: encryption and decryption use the same key and IV; CTR alone does not detect ciphertext tampering.](images/lesson3-encryption.png)
+
+Read the blue row from left to right: original message, encryption, ciphertext, decryption, recovered message. Both operations use the same key and the same IV for that message. PSA generates a fresh random IV for each encryption call.
+
+The red row illustrates a limitation of CTR: an attacker can change ciphertext without the key, and CTR decryption alone will not reject the modified message. This row explains the concept; the current lesson code does not perform that tampering experiment. Its local comparison against the original would detect a mismatch, but a real receiver normally does not have the original to compare against.
+
+The image was created with the built-in image-generation tool; the [generation prompt](images/lesson3-encryption-prompt.md) is saved alongside it.
+
 ## 1. What are we trying to learn?
 
 Encrypt readable text, decrypt it with the same key, and verify that the recovered bytes exactly match the original.

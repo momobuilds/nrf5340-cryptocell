@@ -10,7 +10,8 @@ Usage (from the cryptocell directory):
   ./lesson.sh build 1       Build the random-byte lesson
   ./lesson.sh build 2       Build the SHA-256 lesson
   ./lesson.sh build 3       Build the educational AES-CTR lesson
-  ./lesson.sh flash 1       Build and flash the selected lesson (1, 2, or 3)
+  ./lesson.sh build 4       Build the authenticated AES-CCM lesson
+  ./lesson.sh flash 1       Build and flash the selected lesson (1, 2, 3, or 4)
   ./lesson.sh ports         List macOS serial ports
   ./lesson.sh monitor PORT  Open a serial port at 115200 baud
 
@@ -47,7 +48,8 @@ case "${2:-}" in
     1) lesson_name=01_random ;;
     2) lesson_name=02_sha256 ;;
     3) lesson_name=03_aes_ctr ;;
-    *) echo 'Choose lesson 1, 2, or 3.' >&2; exit 2 ;;
+    4) lesson_name=04_aead_ccm ;;
+    *) echo 'Choose lesson 1, 2, 3, or 4.' >&2; exit 2 ;;
 esac
 
 sdk_dir="${WINGS_NCS_DIR:-/opt/nordic/ncs/v2.4.0}"

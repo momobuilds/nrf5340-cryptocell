@@ -4,7 +4,7 @@ Start here when returning to the project. Each lesson is now a separate, runnabl
 
 ## What have we done?
 
-We prepared three small demonstrations on the nRF5340 DK:
+We prepared four small demonstrations on the nRF5340 DK:
 
 | Phase | Question it answers | Open the lesson |
 | --- | --- | --- |
@@ -12,10 +12,11 @@ We prepared three small demonstrations on the nRF5340 DK:
 | 1 | Can the board initialize PSA Crypto and generate secure random bytes? | [Random generation](lessons/01_random/README.md) |
 | 2 | What is a hash, and how does changing a message affect it? | [SHA-256](lessons/02_sha256/README.md) |
 | 3 | Can we encrypt a message and recover it with the same key? | [AES-128-CTR](lessons/03_aes_ctr/README.md) |
+| 4 | Can a receiver authenticate and decrypt simulated samples without knowing their original values? | [AES-128-CCM](lessons/04_aead_ccm/README.md) |
 
-All three independent applications have been built with the installed SDK. Successful flashing was reported earlier, and you reported seeing console output. Complete device logs confirming every lesson's result have not been recorded in the conversation. **Build success is not proof of a successful device demonstration.** See [progress and verification](docs/PROGRESS.md).
+All four independent applications have been built with the installed SDK. Successful flashing was reported earlier, and you reported seeing console output. Complete device logs confirming every lesson's result have not been recorded in the conversation. **Build success is not proof of a successful device demonstration.** See [progress and verification](docs/PROGRESS.md).
 
-Phase 3 is educational encryption without authentication. We have not implemented the authenticated EMG-to-PC pipeline yet. Phase 4 is the next crypto lesson, after you are ready; no Phase 4 code was added during this reorganization.
+Phase 3 is educational encryption without authentication. We have not implemented the authenticated EMG-to-PC pipeline yet. Lesson 4 now adds a local authenticated round trip for simulated samples. It builds successfully; its board result is pending. Lesson 5 (deliberate corruption) has not been implemented.
 
 ## The easiest way to revisit a lesson
 
@@ -25,7 +26,7 @@ Open a terminal in this `cryptocell` folder:
 ./lesson.sh build 1
 ```
 
-Change `1` to `2` or `3` to select another lesson. The helper sets up the installed SDK and compiler automatically. No repeated `export` commands are needed, including in a new terminal.
+Change `1` to `2`, `3`, or `4` to select another lesson. The helper sets up the installed SDK and compiler automatically. No repeated `export` commands are needed, including in a new terminal.
 
 To build and program one lesson onto the connected nRF5340 DK:
 
@@ -56,7 +57,8 @@ cryptocell/
 │   ├── 00_architecture/README.md  conceptual lesson, no firmware
 │   ├── 01_random/
 │   ├── 02_sha256/
-│   └── 03_aes_ctr/
+│   ├── 03_aes_ctr/
+│   └── 04_aead_ccm/
 ├── docs/
 │   ├── SETUP.md                  tools, folders, UI, configuration
 │   ├── PROGRESS.md               what happened and what is verified
@@ -70,13 +72,13 @@ cryptocell/
 
 Each numbered firmware lesson contains its own `README.md`, `src/main.c`, `prj.conf`, `CMakeLists.txt`, and generated `build/`. Edit that lesson's source; do not edit generated files.
 
-The old root project remains as a snapshot of where we were. Use the `lessons/` projects for future learning. The Nordic VS Code application list now points to those three folders.
+The old root project remains as a snapshot of where we were. Use the `lessons/` projects for future learning. The Nordic VS Code application list now points to those four folders.
 
 ## A short reminder
 
 - **Random bytes:** newly generated unpredictable data; not encrypted data.
 - **Hash:** a deterministic fingerprint; not encryption and not authentication by itself.
 - **Encryption:** transforms plaintext into ciphertext and can be reversed with the key and required parameters.
-- **Authenticated encryption:** also checks for tampering; this is the next lesson, not yet implemented.
+- **Authenticated encryption:** also checks for tampering; Lesson 4 introduces it through AES-CCM.
 
 For the supervisor, start with [the presentation notes](docs/SUPERVISOR.md). For the exact history and remaining checks, use [the progress record](docs/PROGRESS.md).
