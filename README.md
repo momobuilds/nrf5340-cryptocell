@@ -1,84 +1,60 @@
-# Wings crypto learning notebook
+# nRF5340 CryptoCell — Securing Wearable EMG Data on the Edge
 
-Start here when returning to the project. Each lesson is now a separate, runnable Zephyr application. Moving to another lesson does not replace earlier source code.
+Hardware-accelerated cryptography on the **Nordic nRF5340 DK** (Zephyr / nRF Connect SDK, PSA Crypto API, Arm CryptoCell-312), built as the security groundwork for **Wings**, a wearable EMG system that streams muscle signals over BLE.
 
-## What have we done?
-
-We prepared four small demonstrations on the nRF5340 DK:
-
-| Phase | Question it answers | Open the lesson |
-| --- | --- | --- |
-| 0 | Where should encryption fit in Wings? | [Architecture](lessons/00_architecture/README.md) |
-| 1 | Can the board initialize PSA Crypto and generate secure random bytes? | [Random generation](lessons/01_random/README.md) |
-| 2 | What is a hash, and how does changing a message affect it? | [SHA-256](lessons/02_sha256/README.md) |
-| 3 | Can we encrypt a message and recover it with the same key? | [AES-128-CTR](lessons/03_aes_ctr/README.md) |
-| 4 | Can a receiver authenticate and decrypt simulated samples without knowing their original values? | [AES-128-CCM](lessons/04_aead_ccm/README.md) |
-
-All four independent applications have been built with the installed SDK. Successful flashing was reported earlier, and you reported seeing console output. Complete device logs confirming every lesson's result have not been recorded in the conversation. **Build success is not proof of a successful device demonstration.** See [progress and verification](docs/PROGRESS.md).
-
-Phase 3 is educational encryption without authentication. We have not implemented the authenticated EMG-to-PC pipeline yet. Lesson 4 now adds a local authenticated round trip for simulated samples. It builds successfully; its board result is pending. Lesson 5 (deliberate corruption) has not been implemented.
-
-## The easiest way to revisit a lesson
-
-Open a terminal in this `cryptocell` folder:
-
-```sh
-./lesson.sh build 1
-```
-
-Change `1` to `2`, `3`, or `4` to select another lesson. The helper sets up the installed SDK and compiler automatically. No repeated `export` commands are needed, including in a new terminal.
-
-To build and program one lesson onto the connected nRF5340 DK:
-
-```sh
-./lesson.sh flash 1
-```
-
-Flashing changes the program stored on the board. It does not remove any lesson from the Mac. These configurations describe the DK's onboard nRF5340 application core. External-module programming remains a separate, unfinished setup task.
-
-To view output:
-
-```sh
-./lesson.sh ports
-./lesson.sh monitor /dev/cu.usbmodem0010500464391
-```
-
-Use the port actually present on your Mac; the suffix can change. Press RESET after opening the terminal because each lesson prints once per boot. Exit with **Ctrl-A**, then **K**, then **Y**.
-
-Prefer buttons? Read the [VS Code UI instructions](docs/SETUP.md#using-the-nordic-vs-code-ui).
-
-## Folder map
+The goal: protect sensor samples **on the device, before they leave it**, so a receiver can both decrypt the data and detect tampering.
 
 ```text
-cryptocell/
-├── README.md                     start here
-├── lesson.sh                     simple build/flash/monitor helper
-├── lessons/
-│   ├── 00_architecture/README.md  conceptual lesson, no firmware
-│   ├── 01_random/
-│   ├── 02_sha256/
-│   ├── 03_aes_ctr/
-│   └── 04_aead_ccm/
-├── docs/
-│   ├── SETUP.md                  tools, folders, UI, configuration
-│   ├── PROGRESS.md               what happened and what is verified
-│   ├── SUPERVISOR.md             short presentation notes
-│   └── TROUBLESHOOTING.md        errors we encountered
-├── src/main.c                    original root Phase 3 project, preserved
-├── prj.conf                      original root configuration, preserved
-├── CMakeLists.txt                original root build file, preserved
-└── build/                        old root build, preserved
+EMG ADC → buffer → local features → [ AES-CCM: encrypt + authenticate ] → BLE packet → PC
+                                      ▲ this repo
 ```
 
-Each numbered firmware lesson contains its own `README.md`, `src/main.c`, `prj.conf`, `CMakeLists.txt`, and generated `build/`. Edit that lesson's source; do not edit generated files.
+## What's implemented
 
-The old root project remains as a snapshot of where we were. Use the `lessons/` projects for future learning. The Nordic VS Code application list now points to those four folders.
+Each step is a standalone Zephyr application, so every concept can be built, flashed and tested on its own.
 
-## A short reminder
+| # | Topic | What the firmware does | Backend |
+|---|---|---|---|
+| 0 | [Architecture](lessons/00_architecture/README.md) | Where encryption belongs in the EMG → BLE pipeline | — |
+| 1 | [Secure RNG](lessons/01_random/README.md) | Initializes PSA Crypto and generates 16 secure random bytes | CC312 TRNG |
+| 2 | [SHA-256](lessons/02_sha256/README.md) | Hashes two packets differing by one character; checked against Python `hashlib` | Oberon |
+| 3 | [AES-128-CTR](lessons/03_aes_ctr/README.md) | Encrypts / decrypts a packet with a random IV and verifies a byte-exact round trip | Oberon |
+| 4 | [AES-128-CCM (AEAD)](lessons/04_aead_ccm/README.md) | Encrypts 8 simulated EMG samples with AAD, 13-byte nonce and 16-byte tag; receiver authenticates before accepting data | CC312 |
 
-- **Random bytes:** newly generated unpredictable data; not encrypted data.
-- **Hash:** a deterministic fingerprint; not encryption and not authentication by itself.
-- **Encryption:** transforms plaintext into ciphertext and can be reversed with the key and required parameters.
-- **Authenticated encryption:** also checks for tampering; Lesson 4 introduces it through AES-CCM.
+## Status
 
-For the supervisor, start with [the presentation notes](docs/SUPERVISOR.md). For the exact history and remaining checks, use [the progress record](docs/PROGRESS.md).
+- All four firmware applications build for `nrf5340dk_nrf5340_cpuapp` (NCS 2.4.0).
+- Lesson 1 flashed and running on the DK; on-device transcripts for lessons 2–4 are pending and tracked in [docs/PROGRESS.md](docs/PROGRESS.md).
+- CC312 hardware backend confirmed for RNG and AES-CCM by inspecting the compiled driver paths.
+- **Next:** deliberate-corruption test (tampered tag/ciphertext must be rejected), then integration into the real EMG → BLE stream.
+
+> ⚠️ Keys in this repo are **public test keys** for learning and demos only — not for production use.
+
+## Build & flash
+
+```sh
+./lesson.sh build 4          # build lesson 4 (1–4)
+./lesson.sh flash 4          # build + flash to the connected nRF5340 DK
+./lesson.sh ports            # list serial ports
+./lesson.sh monitor <port>   # open serial console, then press RESET
+```
+
+Toolchain details, VS Code (nRF Connect) instructions and known issues: [SETUP](docs/SETUP.md) · [TROUBLESHOOTING](docs/TROUBLESHOOTING.md).
+
+## Repository layout
+
+```text
+lessons/            one independent Zephyr app per step (src/, prj.conf, CMakeLists.txt)
+docs/               setup, progress/verification log, troubleshooting, presentation notes
+lesson.sh           build / flash / monitor helper
+src/, prj.conf      original single-project version (kept for reference)
+```
+
+## Key concepts
+
+- **Random bytes** — unpredictable data used for keys and nonces; not encryption by itself.
+- **Hash** — deterministic fingerprint; detects changes but provides no secrecy or authentication alone.
+- **Encryption (CTR)** — confidentiality only; an attacker can still flip bits undetected.
+- **Authenticated encryption (CCM)** — confidentiality **and** integrity: the receiver rejects any modified packet.
+
+**Stack:** C · Zephyr RTOS · nRF Connect SDK · PSA Crypto · Arm CryptoCell-312 · nRF5340
